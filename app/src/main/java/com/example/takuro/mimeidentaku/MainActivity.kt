@@ -26,7 +26,7 @@ public class MainActivity : AppCompatActivity() {
         } else {
             if(edittext.text.equals("") || edittext.text == null){
                 edittext.text = button.text
-            }else if(edittext.text.toString().equals("0")){
+            }else if(edittext.text.toString().equals("0")){//It may have bag.
                 if(button.text.toString().equals(".")){
                     edittext.append(button.text)
                 }else{
