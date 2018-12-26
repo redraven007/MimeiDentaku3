@@ -50,7 +50,7 @@ public class MainActivity : AppCompatActivity() {
             if(result.toString().substring(result.toString().length - 2).equals(".0")){
                 edittext.setText(result.toString().dropLast(2))
             }else{
-                edittext.setText(result.toString())
+                edittext.setText(result.toString() )
             }
         }
 
