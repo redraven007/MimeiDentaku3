@@ -26,8 +26,12 @@ public class MainActivity : AppCompatActivity() {
         } else {
             if(edittext.text.equals("") || edittext.text == null){
                 edittext.text = button.text
-            }else if(edittext.text.equals("0")){
-                edittext.text = button.text
+            }else if(edittext.text.toString().equals("0")){
+                if(button.text.toString().equals(".")){
+                    edittext.append(button.text)
+                }else{
+                    edittext.text = button.text
+                }
             }else{
                 edittext.append(button.text)
             }
@@ -47,10 +51,16 @@ public class MainActivity : AppCompatActivity() {
             result = value
         } else {
             result = calc(recentOperator, result, value)
-            if(result.toString().substring(result.toString().length - 2).equals(".0")){
-                edittext.setText(result.toString().dropLast(2))
+            var resultString = "%.7f".format(result)
+            if(resultString.contains(".")){
+                while(resultString.substring(resultString.length - 1).equals("0")){
+                    resultString = resultString.dropLast(1)
+                }
+            }
+            if(resultString.substring(resultString.length - 1).equals(".")){
+                edittext.setText(resultString.dropLast(1))
             }else{
-                edittext.setText(result.toString())
+                edittext.setText(resultString)
             }
         }
 
