@@ -15,13 +15,12 @@ public class MainActivity : AppCompatActivity() {
     internal var result: Double = 0.toDouble()  // 計算結果
     internal var isOperatorKeyPushed: Boolean = false    // 計算キーが押されたことを記憶
     internal var isTypingNum :Boolean = false // 数値入力中か否かの判定
+    internal var timeMagicFlag :Boolean = false // 現在時刻が表示されるマジックをやるかどうかのフラグ
 
     internal var buttonListener: View.OnClickListener =
         View.OnClickListener {
-            operator.text = ""
-            maintext.text = "0"
-            result = 0.0
-            isOperatorKeyPushed = false
+            init()
+            timeMagicFlag = true
         }
 
     internal var buttonNumberListener: View.OnClickListener = View.OnClickListener { view ->
@@ -29,22 +28,13 @@ public class MainActivity : AppCompatActivity() {
         if(maintext.text.toString().length < 10) {
 //      直前に押された演算記号が"="だった場合はACと同じ処理
             if (recentOperator == R.id.button_equal && isTypingNum == false) {
-                isOperatorKeyPushed = false
-                operator.text = ""
-                maintext.text = "0"
-                result = 0.0
+                init()
             }
             if (isOperatorKeyPushed == true) {
                 maintext.setText(button.text)
             } else {
                 if (maintext.text.equals("") || maintext.text == null) {
                     maintext.text = button.text
-//                if(button.text.toString().equals(".")){
-//                    maintext.text = "0"
-//                    maintext.append(button.text)
-//                }else{
-//                    maintext.text = button.text
-//                }
                 } else if (maintext.text.toString().equals("0")) {
                     if (button.text.toString().equals(".")) {
                         maintext.append(button.text)
@@ -63,9 +53,9 @@ public class MainActivity : AppCompatActivity() {
     internal var buttonOperatorListener: View.OnClickListener = View.OnClickListener { view ->
         val operatorButton = view as Button
         val value = java.lang.Double.parseDouble(maintext.text.toString())
-        if (recentOperator == R.id.button_equal) {
-            result = value
-        } else {
+//        if (recentOperator == R.id.button_equal) {
+//            result = value
+//        } else {
             result = calc(recentOperator, result, value)
             var resultString = "%.7f".format(result)
             if(resultString.contains(".")){
@@ -78,7 +68,7 @@ public class MainActivity : AppCompatActivity() {
             }else{
                 maintext.setText(resultString)
             }
-        }
+//        }
 
         recentOperator = operatorButton.id
         operator.text = operatorButton.text
@@ -121,7 +111,15 @@ public class MainActivity : AppCompatActivity() {
             R.id.button_subtract -> return value1 - value2
             R.id.button_multiply -> return value1 * value2
             R.id.button_divide -> return value1 / value2
-            else -> return value1
+            else -> return value2
         }
+    }
+
+    internal fun init(){
+        recentOperator = R.id.button_equal
+        isOperatorKeyPushed = false
+        operator.text = ""
+        maintext.text = "0"
+        result = 0.0
     }
 }
