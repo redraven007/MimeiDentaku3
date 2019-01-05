@@ -2,6 +2,8 @@ package com.example.takuro.mimeidentaku
 
 import android.app.Activity
 import android.content.Context
+import android.icu.util.Calendar
+import android.icu.util.TimeZone
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -9,6 +11,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
+import java.text.SimpleDateFormat
+import java.util.*
+import com.example.takuro.mimeidentaku.DateTime
 
 public class MainActivity : AppCompatActivity() {
     internal var recentOperator = R.id.button_equal // 最近押された計算キー
@@ -20,7 +25,7 @@ public class MainActivity : AppCompatActivity() {
     internal var buttonListener: View.OnClickListener =
         View.OnClickListener {
             init()
-            timeMagicFlag = true
+            timeMagicFlag = !timeMagicFlag
         }
 
     internal var buttonNumberListener: View.OnClickListener = View.OnClickListener { view ->
@@ -53,10 +58,7 @@ public class MainActivity : AppCompatActivity() {
     internal var buttonOperatorListener: View.OnClickListener = View.OnClickListener { view ->
         val operatorButton = view as Button
         val value = java.lang.Double.parseDouble(maintext.text.toString())
-//        if (recentOperator == R.id.button_equal) {
-//            result = value
-//        } else {
-            result = calc(recentOperator, result, value)
+            result = calc(recentOperator,operatorButton.id, result, value)
             var resultString = "%.7f".format(result)
             if(resultString.contains(".")){
                 while(resultString.substring(resultString.length - 1).equals("0")){
@@ -68,7 +70,6 @@ public class MainActivity : AppCompatActivity() {
             }else{
                 maintext.setText(resultString)
             }
-//        }
 
         recentOperator = operatorButton.id
         operator.text = operatorButton.text
@@ -105,7 +106,7 @@ public class MainActivity : AppCompatActivity() {
 
     }
 
-    internal fun calc(operator: Int, value1: Double, value2: Double): Double {
+    internal fun calcStandard(operator: Int, value1: Double, value2: Double): Double {
         when (operator) {
             R.id.button_add -> return value1 + value2
             R.id.button_subtract -> return value1 - value2
@@ -114,6 +115,29 @@ public class MainActivity : AppCompatActivity() {
             else -> return value2
         }
     }
+
+    internal fun getDate():String{
+
+        var date: Date = Date()
+        var df = SimpleDateFormat("MMddHHmm")
+        df.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Tokyo"))
+        var dateString = df.format(date)
+
+        if(dateString.substring(0,1).equals("0")){
+            return dateString.drop(1)
+        }else{
+            return dateString
+        }
+    }
+
+    internal fun calc(operator: Int,pushedOperator:Int, value1: Double, value2: Double): Double{
+        if(timeMagicFlag && pushedOperator == R.id.button_equal){
+            return getDate().toDouble()
+        }else{
+            return calcStandard(operator,value1,value2)
+        }
+    }
+
 
     internal fun init(){
         recentOperator = R.id.button_equal
