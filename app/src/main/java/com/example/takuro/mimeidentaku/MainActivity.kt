@@ -11,42 +11,58 @@ import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
 
 public class MainActivity : AppCompatActivity() {
+    internal var recentOperator = R.id.button_equal // 最近押された計算キー
+    internal var result: Double = 0.toDouble()  // 計算結果
+    internal var isOperatorKeyPushed: Boolean = false    // 計算キーが押されたことを記憶
+    internal var isTypingNum :Boolean = false // 数値入力中か否かの判定
 
     internal var buttonListener: View.OnClickListener =
         View.OnClickListener {
-            textview.text = ""
-            edittext.text = "0"
+            operator.text = ""
+            maintext.text = "0"
+            result = 0.0
+            isOperatorKeyPushed = false
         }
 
     internal var buttonNumberListener: View.OnClickListener = View.OnClickListener { view ->
         val button = view as Button
-
-        if (isOperatorKeyPushed == true) {
-            edittext.setText(button.text)
-        } else {
-            if(edittext.text.equals("") || edittext.text == null){
-                edittext.text = button.text
-            }else if(edittext.text.toString().equals("0")){//It may have bag.
-                if(button.text.toString().equals(".")){
-                    edittext.append(button.text)
-                }else{
-                    edittext.text = button.text
-                }
-            }else{
-                edittext.append(button.text)
+        if(maintext.text.toString().length < 10) {
+//      直前に押された演算記号が"="だった場合はACと同じ処理
+            if (recentOperator == R.id.button_equal && isTypingNum == false) {
+                isOperatorKeyPushed = false
+                operator.text = ""
+                maintext.text = "0"
+                result = 0.0
             }
+            if (isOperatorKeyPushed == true) {
+                maintext.setText(button.text)
+            } else {
+                if (maintext.text.equals("") || maintext.text == null) {
+                    maintext.text = button.text
+//                if(button.text.toString().equals(".")){
+//                    maintext.text = "0"
+//                    maintext.append(button.text)
+//                }else{
+//                    maintext.text = button.text
+//                }
+                } else if (maintext.text.toString().equals("0")) {
+                    if (button.text.toString().equals(".")) {
+                        maintext.append(button.text)
+                    } else {
+                        maintext.text = button.text
+                    }
+                } else {
+                    maintext.append(button.text)
+                }
+            }
+            isTypingNum = true
+            isOperatorKeyPushed = false
         }
-
-        isOperatorKeyPushed = false
     }
-
-    internal var recentOperator = R.id.button_equal // 最近押された計算キー
-    internal var result: Double = 0.toDouble()  // 計算結果
-    internal var isOperatorKeyPushed: Boolean = false    // 計算キーが押されたことを記憶
 
     internal var buttonOperatorListener: View.OnClickListener = View.OnClickListener { view ->
         val operatorButton = view as Button
-        val value = java.lang.Double.parseDouble(edittext.text.toString())
+        val value = java.lang.Double.parseDouble(maintext.text.toString())
         if (recentOperator == R.id.button_equal) {
             result = value
         } else {
@@ -58,23 +74,24 @@ public class MainActivity : AppCompatActivity() {
                 }
             }
             if(resultString.substring(resultString.length - 1).equals(".")){
-                edittext.setText(resultString.dropLast(1))
+                maintext.setText(resultString.dropLast(1))
             }else{
-                edittext.setText(resultString)
+                maintext.setText(resultString)
             }
         }
 
         recentOperator = operatorButton.id
-        textview.text = operatorButton.text
+        operator.text = operatorButton.text
         isOperatorKeyPushed = true
+        isTypingNum = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById(R.id.textview) as TextView
-        findViewById(R.id.edittext) as TextView
+        findViewById(R.id.operator) as TextView
+        findViewById(R.id.maintext) as TextView
         findViewById(R.id.button) as Button
         button.setOnClickListener(buttonListener)
 

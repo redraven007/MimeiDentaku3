@@ -11,34 +11,39 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textview"
+        android:id="@+id/operator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="20dp"
         android:text=""/>
 
     <TextView
-        android:id="@+id/edittext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textview"
-        android:textSize="30dp"
-        android:textColor="#000000"
-        android:textDirection="inherit"
-        android:text="0"
-    />
+            android:id="@+id/maintext"
+            android:layout_width="294dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/operator"
+            android:textSize="50dp"
+            android:textColor="#000000"
+            android:textDirection="inherit"
+            android:textAlignment="textEnd"
+            android:text="0"
+            android:layout_centerHorizontal="true" android:layout_marginTop="0dp"/>
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edittext"
-        android:text="clear"/>
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/maintext"
+            style="?attr/buttonBarButtonStyle"
+            android:textColor="#0000FF"
+            android:textSize="30dp"
+            android:text="AC" android:layout_centerHorizontal="true"/>
 
     <include
-        layout="@layout/ten_key"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button"
-        />
+            layout="@layout/ten_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/button"
+            android:layout_marginTop="0dp" />
 
 </RelativeLayout>
