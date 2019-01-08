@@ -19,8 +19,8 @@ public class MainActivity : AppCompatActivity() {
     internal var recentOperator = R.id.button_equal // 最近押された計算キー
     internal var result: Double = 0.toDouble()  // 計算結果
     internal var isOperatorKeyPushed: Boolean = false    // 計算キーが押されたことを記憶
-    internal var isTypingNum :Boolean = false // 数値入力中か否かの判定
-    internal var timeMagicFlag :Boolean = false // 現在時刻が表示されるマジックをやるかどうかのフラグ
+    internal var isTypingNum: Boolean = false // 数値入力中か否かの判定
+    internal var timeMagicFlag: Boolean = false // 現在時刻が表示されるマジックをやるかどうかのフラグ
 
     internal var buttonListener: View.OnClickListener =
         View.OnClickListener {
@@ -29,24 +29,34 @@ public class MainActivity : AppCompatActivity() {
         }
 
     internal var buttonNumberListener: View.OnClickListener = View.OnClickListener { view ->
+        if (recentOperator == R.id.button_equal && !isTypingNum) {
+            init()
+        }
         val button = view as Button
-        if(maintext.text.toString().length < 8) {
+//        TODO なんか8桁数値入れるとバグる(計算結果が1.0EとかになってDoubleのtoStringがうまくいかなくなる)
+//        なのでとりあえず7桁までしか入力できなくして暫定対応
+//        ↑なんかいじってるうちに大丈夫になってきた感じあるけどまだよくわからんしそのままです
+        if (maintext.text.toString().length < 7 || !isTypingNum) {
 //      直前に押された演算記号が"="だった場合はACと同じ処理
-            if (recentOperator == R.id.button_equal && isTypingNum == false) {
-                init()
-            }
+            var mainTextString = maintext.text.toString()
             if (isOperatorKeyPushed == true) {
                 maintext.setText(button.text)
             } else {
-                if (maintext.text.equals("") || maintext.text == null) {
+                if (mainTextString.equals("") || mainTextString == null) {
                     maintext.text = button.text
-                } else if (maintext.text.toString().equals("0")) {
+                } else if (mainTextString.equals("0")) {
                     if (button.text.toString().equals(".")) {
                         maintext.append(button.text)
                     } else {
                         maintext.text = button.text
                     }
-                } else {
+                } else if(mainTextString.substring(mainTextString.length - 1).equals(".")){
+                    if (button.text.toString().equals(".")) {
+                        //何もしない
+                    } else {
+                        maintext.append(button.text)
+                    }
+                }else{
                     maintext.append(button.text)
                 }
             }
@@ -58,24 +68,36 @@ public class MainActivity : AppCompatActivity() {
     internal var buttonOperatorListener: View.OnClickListener = View.OnClickListener { view ->
         val operatorButton = view as Button
         val value = java.lang.Double.parseDouble(maintext.text.toString())
-            result = calc(recentOperator,operatorButton.id, result, value)
-            var resultString = "%.7f".format(result)
-            if(resultString.contains(".")){
-                while(resultString.substring(resultString.length - 1).equals("0")){
-                    resultString = resultString.dropLast(1)
-                }
-                //文字列を小数点で切って後半の小数点以下部分を3桁以下に
-                //TODO 全体の文字列が8文字以内になるように調整したい
-                var array = resultString.split(".".toRegex())
-                if(array[1].length > 3){
-
+        result = calc(recentOperator, operatorButton.id, result, value)
+        var resultString = "%.7f".format(result)
+        if (resultString.contains(".")) {
+            while (resultString.substring(resultString.length - 1).equals("0")) {
+                resultString = resultString.dropLast(1)
+            }
+            if (resultString.substring(resultString.length - 1).equals(".")) {
+                resultString = resultString.dropLast(1)
+            }
+            //文字列を小数点で切って後半の小数点以下部分を3桁以下に
+            if (resultString.contains(".")) {
+                var array = resultString.split(".")
+                if (array[0].length + array[1].length > 7) {
+                    when (array[0].length) {
+                        1 -> resultString = "%.6f".format(result)
+                        2 -> resultString = "%.5f".format(result)
+                        3 -> resultString = "%.4f".format(result)
+                        4 -> resultString = "%.3f".format(result)
+                        5 -> resultString = "%.2f".format(result)
+                        6 -> resultString = "%.1f".format(result)
+                    }
                 }
             }
-            if(resultString.substring(resultString.length - 1).equals(".")){
-                maintext.setText(resultString.dropLast(1))
-            }else{
-                maintext.setText(resultString)
-            }
+        }
+        if (resultString.length > 8) {
+            result = 99999999.0
+            maintext.setText("99999999")
+        } else {
+            maintext.setText(resultString)
+        }
 
         recentOperator = operatorButton.id
         operator.text = operatorButton.text
@@ -122,30 +144,30 @@ public class MainActivity : AppCompatActivity() {
         }
     }
 
-    internal fun getDate():String{
+    internal fun getDate(): String {
 
         var date: Date = Date()
         var df = SimpleDateFormat("MMddHHmm")
         df.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Tokyo"))
         var dateString = df.format(date)
 
-        if(dateString.substring(0,1).equals("0")){
+        if (dateString.substring(0, 1).equals("0")) {
             return dateString.drop(1)
-        }else{
+        } else {
             return dateString
         }
     }
 
-    internal fun calc(operator: Int,pushedOperator:Int, value1: Double, value2: Double): Double{
-        if(timeMagicFlag && pushedOperator == R.id.button_equal){
+    internal fun calc(operator: Int, pushedOperator: Int, value1: Double, value2: Double): Double {
+        if (timeMagicFlag && pushedOperator == R.id.button_equal) {
             return getDate().toDouble()
-        }else{
-            return calcStandard(operator,value1,value2)
+        } else {
+            return calcStandard(operator, value1, value2)
         }
     }
 
 
-    internal fun init(){
+    internal fun init() {
         recentOperator = R.id.button_equal
         isOperatorKeyPushed = false
         operator.text = ""
