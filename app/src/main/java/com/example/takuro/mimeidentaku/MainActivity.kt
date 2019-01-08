@@ -30,7 +30,7 @@ public class MainActivity : AppCompatActivity() {
 
     internal var buttonNumberListener: View.OnClickListener = View.OnClickListener { view ->
         val button = view as Button
-        if(maintext.text.toString().length < 10) {
+        if(maintext.text.toString().length < 8) {
 //      直前に押された演算記号が"="だった場合はACと同じ処理
             if (recentOperator == R.id.button_equal && isTypingNum == false) {
                 init()
@@ -63,6 +63,12 @@ public class MainActivity : AppCompatActivity() {
             if(resultString.contains(".")){
                 while(resultString.substring(resultString.length - 1).equals("0")){
                     resultString = resultString.dropLast(1)
+                }
+                //文字列を小数点で切って後半の小数点以下部分を3桁以下に
+                //TODO 全体の文字列が8文字以内になるように調整したい
+                var array = resultString.split(".".toRegex())
+                if(array[1].length > 3){
+
                 }
             }
             if(resultString.substring(resultString.length - 1).equals(".")){
