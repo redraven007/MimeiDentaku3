@@ -88,6 +88,7 @@ public class MainActivity : AppCompatActivity() {
                         4 -> resultString = "%.3f".format(result)
                         5 -> resultString = "%.2f".format(result)
                         6 -> resultString = "%.1f".format(result)
+                        7 -> resultString = "%.0f".format(result)
                     }
                 }
             }
